@@ -28,9 +28,7 @@ class RunParser(object):
             self.parse()
             self.create_db_obj()
         else:
-            raise os.error(" flowcell cannot be found at {0}".format(path))
-
-
+            raise os.error("Flowcell cannot be found at {0}".format(path))
 
     def parse(self, demultiplexingDir='Demultiplexing'):
         """Tries to parse as many files as possible from a run folder"""
@@ -42,22 +40,21 @@ class RunParser(object):
             pattern = r'(\d{6,8})_([ST-]*\w+\d+)_\d+_([A-Z0-9\-]+)'
             m       = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
             group_no = 3
+
         fc_name = m.group(group_no)
         rinfo_path=os.path.join(self.path, 'RunInfo.xml')
         rpar_path=os.path.join(self.path, 'runParameters.xml')        
         ss_path=os.path.join(self.path, 'SampleSheet.csv')
+        cycle_times_log = os.path.join(self.path, 'Logs', 'CycleTimes.txt')
 
-	cycle_times_log = os.path.join(self.path, 'Logs', "CycleTimes.txt")
-
-       
-	#These three are generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
+	    #These three are generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
 
         lb_path=os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
         ln_path=os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
-        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir,  "Stats")	
-	json_path = os.path.join(self.path, demultiplexingDir,  "Stats", "Stats.json")
+        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, "Stats")	
+	    json_path = os.path.join(self.path, demultiplexingDir, "Stats", "Stats.json")
 
-	try:
+	    try:
             self.runinfo=RunInfoParser(rinfo_path)
         except OSError as e:
             self.log.info(str(e))
@@ -92,7 +89,7 @@ class RunParser(object):
         except OSError as e:
             self.log.info(str(e))
             self.time_cycles = None
-	try:
+	    try:
             self.json_stats = StatsParser(json_path)
         except OSError as e:
             self.log.info(str(e))
@@ -503,5 +500,5 @@ class StatsParser(object):
             raise os.error("file {0} cannot be found".format(path))
 
     def parse(self):
-	with open(self.path) as data:
+        with open(self.path) as data:
             self.data=json.load(data)

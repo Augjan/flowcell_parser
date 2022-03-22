@@ -1,2 +1,5 @@
 flowcell_parser/db.pyc
 flowcell_parser/classes.pyc
+build/
+dist/
+*/__pycache__/

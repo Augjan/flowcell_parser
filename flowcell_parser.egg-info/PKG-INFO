@@ -1,11 +1,12 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: flowcell-parser
 Version: 1.0.3
 Summary: Fetches data from demultiplexed flowcells and pushes it into statusdb
-Home-page: UNKNOWN
 Author: Denis Moreno
 Author-email: denis.moreno@scilifelab.se
 License: UNKNOWN
-Description-Content-Type: UNKNOWN
-Description: UNKNOWN
 Platform: UNKNOWN
+License-File: LICENSE
+
+UNKNOWN
+
