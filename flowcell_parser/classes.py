@@ -6,6 +6,7 @@ import logging
 import glob
 import json
 from datetime import datetime
+import pdb
 
 from collections import OrderedDict
 from bs4 import BeautifulSoup #html parser
@@ -14,7 +15,7 @@ from bs4 import BeautifulSoup #html parser
 class RunParser(object):
     """Parses an Illumina run folder. It generates data for statusdb
     notable attributes :
-    
+
     :RunInfoParser runinfo: see RunInfo
     :RunParametersParser runparameters: see RunParametersParser
     :SampleSheetParser samplesheet: see SampleSheetParser
@@ -47,14 +48,14 @@ class RunParser(object):
         ss_path=os.path.join(self.path, 'SampleSheet.csv')
         cycle_times_log = os.path.join(self.path, 'Logs', 'CycleTimes.txt')
 
-	    #These three are generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
+        #These three are generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
 
-        lb_path=os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
-        ln_path=os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
-        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, "Stats")	
-	    json_path = os.path.join(self.path, demultiplexingDir, "Stats", "Stats.json")
-
-	    try:
+        lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
+        ln_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
+        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')	
+        json_path = os.path.join(self.path, demultiplexingDir, 'Stats', 'Stats.json') 
+        
+        try:
             self.runinfo=RunInfoParser(rinfo_path)
         except OSError as e:
             self.log.info(str(e))
@@ -63,7 +64,7 @@ class RunParser(object):
             self.runparameters=RunParametersParser(rpar_path)
         except OSError as e:
             self.log.info(str(e))
-            self.runParameters=None
+            self.runparameters=None
         try:
             self.samplesheet=SampleSheetParser(ss_path)
         except OSError as e:
@@ -89,7 +90,7 @@ class RunParser(object):
         except OSError as e:
             self.log.info(str(e))
             self.time_cycles = None
-	    try:
+        try:
             self.json_stats = StatsParser(json_path)
         except OSError as e:
             self.log.info(str(e))
@@ -129,7 +130,7 @@ class RunParser(object):
 
 
         if self.json_stats:
-	       self.obj['Json_Stats'] = self.json_stats.data
+	        self.obj['Json_Stats'] = self.json_stats.data
       
 
 
@@ -151,7 +152,7 @@ class DemuxSummaryParser(object):
             lane_nb = pattern.search(file).group(1)
             self.result[lane_nb]=OrderedDict()
             self.TOTAL[lane_nb] = 0
-            with open(file, 'rU') as f:
+            with open(file, 'r') as f:
                 undeterminePart = False
                 for line in f:
                     if not undeterminePart:
@@ -177,7 +178,7 @@ class LaneBarcodeParser(object):
     def parse(self):
         self.sample_data=[]
         self.flowcell_data={}
-        with open(self.path, 'rU') as htmlfile:
+        with open(self.path, 'r') as htmlfile:
             bsoup=BeautifulSoup(htmlfile, 'html.parser')
             flowcell_table=bsoup.find_all('table')[1]
             lane_table=bsoup.find_all('table')[2]
@@ -218,17 +219,15 @@ class SampleSheetParser(object):
     .reads : a list of the values in the [Reads] section
     .data : a list of the values under the [Data] section. These values are stored in a dict format
     .datafields : a list of field names for the data section"""
-    def __init__(self, path ):
- 
+    def __init__(self, path):
         self.log=logging.getLogger(__name__)
         if os.path.exists(path):
             self.parse(path)
         else:
             raise os.error(" sample sheet cannot be found at {0}".format(path))
-
+        
 
     def parse(self, path):
-
         flag=None
         header={}
         reads=[]
@@ -237,13 +236,12 @@ class SampleSheetParser(object):
         data=[]
         flag= 'data' #in case of HiSeq samplesheet only data section is present
         separator=","
-        with open(path, 'rU') as csvfile:
+        with open(path, 'r') as csvfile:
             # Ignore empty lines (for instance the Illumina Experiment Manager
             # generates sample sheets with empty lines
             lines = filter(None, (line.rstrip() for line in csvfile))
             # Now parse the file
             for line in lines:
-
                 if '[Header]' in line:
                     flag='HEADER'
                 elif '[Reads]' in line:
@@ -256,7 +254,7 @@ class SampleSheetParser(object):
                     tokens=line.split(separator)
                     if flag == 'HEADER':
                         if len(tokens) < 2:
-                            self.log.error("file {} does not seem has a correct format.".format(path))
+                            self.log.error("file {} does not seem has a correct format.")
                             raise RuntimeError("Could not parse the samplesheet, "
                                                "the file does not seem to have a correct format.")
                         header[tokens[0]]=tokens[1] 
@@ -494,7 +492,7 @@ class StatsParser(object):
         if os.path.exists(path):
             self.path = path
             self.cycles = []
-	    self.data = None
+            self.data = None
             self.parse()
         else:
             raise os.error("file {0} cannot be found".format(path))
