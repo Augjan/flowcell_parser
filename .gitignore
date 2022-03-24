@@ -3,6 +3,7 @@
 *.py[cod]
 
 build/
+dist/
 develop-eggs/
 eggs/
 *.egg-info/

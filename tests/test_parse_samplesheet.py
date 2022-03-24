@@ -1,5 +1,4 @@
-
-import flowcell_parser.classes as classes
+from flowcell_parser import classes
 import os
 
 
@@ -44,5 +43,3 @@ def test_parser():
     assert(k.lanebarcodes.flowcell_data is not None)
     assert(k.lanebarcodes.sample_data is not None)
     assert(k.lanes.sample_data is not None)
-
-

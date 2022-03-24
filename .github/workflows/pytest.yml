@@ -35,8 +35,8 @@ jobs:
         id: install_pytest
         shell: bash -l {0}
         run: |
-          conda activate testenv 
-          pip install --no-cache-dir -r requirements.txt
+          conda activate testenv
+          python setup.py install 
       # Run PyTest
       - name: Run PyTest
         id: pytest

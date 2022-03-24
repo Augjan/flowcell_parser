@@ -1,5 +1,5 @@
 import unittest
-import flowcell_parser.classes as classes
+from flowcell_parser import classes
 import os
 import datetime
 import pdb
