@@ -6,7 +6,6 @@ import logging
 import glob
 import json
 from datetime import datetime
-import pdb
 
 from collections import OrderedDict
 from bs4 import BeautifulSoup #html parser
@@ -132,8 +131,6 @@ class RunParser(object):
         if self.json_stats:
 	        self.obj['Json_Stats'] = self.json_stats.data
       
-
-
 
 class DemuxSummaryParser(object):
     def __init__(self, path):

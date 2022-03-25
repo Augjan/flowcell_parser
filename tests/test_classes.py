@@ -2,7 +2,6 @@ import unittest
 from flowcell_parser import classes
 import os
 import datetime
-import pdb
 
 class TestSampleSheetParser(unittest.TestCase):
 
