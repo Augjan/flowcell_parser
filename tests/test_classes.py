@@ -13,13 +13,26 @@ class TestSampleSheetParser(unittest.TestCase):
                 path,
                 '../test_data/150424_ST-E00214_0031_BH2WY7CCXX/',
                 'SampleSheet.csv'))
-        expected_header = {'Investigator Name': 'Christian Natanaelsson',
-                           'Date': '2015-04-23',
-                           'Experiment Name': 'H2WY7CCXX'}
+        expected_header = {
+            'Investigator Name': 'Christian Natanaelsson',
+            'Date': '2015-04-23',
+            'Experiment Name': 'H2WY7CCXX'
+        }
+        expected_first_row_data = {
+            'Lane': '1',
+            'Project': 'J_Lundeberg_14_24',
+            'SampleID': 'Sample_P1775_147',
+            'SampleName': 'P1775_147',
+            'SamplePlate': 'FCB_150423',
+            'SampleWell': '1:1',
+            'index': 'GAATTCGT'
+        }
 
         self.assertEqual(parsed_sample_sheet.header, expected_header)
         self.assertEqual(parsed_sample_sheet.settings, {})
         self.assertEqual(parsed_sample_sheet.reads, [])
+        self.assertEqual(parsed_sample_sheet.data[0], expected_first_row_data)
+
 
     def test_samplesheet_missing(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -47,24 +60,34 @@ class TestRunInfoParser(unittest.TestCase):
                 os.path.join(
                 path,
                 '../test_data/150424_ST-E00214_0031_BH2WY7CCXX/RunInfo.xml'))
-        expected_data = {'Number': '31',
-                         'FlowcellLayout': {'TileCount': '24',
-                                            'LaneCount': '8',
-                                            'SurfaceCount': '2',
-                                            'SwathCount': '2'},
-                         'Instrument': 'ST-E00214',
-                         'Reads': [{'IsIndexedRead': 'N',
-                                    'NumCycles': '151',
-                                    'Number': '1'},
-                                   {'IsIndexedRead': 'Y',
-                                    'NumCycles': '8',
-                                    'Number': '2'},
-                                   {'IsIndexedRead': 'N',
-                                    'NumCycles': '151',
-                                    'Number': '3'}],
-                         'Flowcell': 'H2WY7CCXX',
-                         'Date': '150424',
-                         'Id': '150424_ST-E00214_0031_BH2WY7CCXX'}
+        expected_data = {
+            'Number': '31',
+                'FlowcellLayout': {
+                    'TileCount': '24',
+                        'LaneCount': '8',
+                        'SurfaceCount': '2',
+                        'SwathCount': '2'
+                    },
+                'Instrument': 'ST-E00214',
+                'Reads': [{
+                    'IsIndexedRead': 'N',
+                    'NumCycles': '151',
+                    'Number': '1'
+                },
+                {
+                    'IsIndexedRead': 'Y',
+                    'NumCycles': '8',
+                    'Number': '2'
+                },
+                {
+                    'IsIndexedRead': 'N',
+                    'NumCycles': '151',
+                    'Number': '3'
+                }],
+                'Flowcell': 'H2WY7CCXX',
+                'Date': '150424',
+                'Id': '150424_ST-E00214_0031_BH2WY7CCXX'
+            }
         self.assertEqual(parsed_run_info.data, expected_data)
         self.assertEqual(parsed_run_info.recipe, "2x151")
 
@@ -87,31 +110,52 @@ class TestRunParametersParser(unittest.TestCase):
                 path,
                 '../test_data/150424_ST-E00214_0031_BH2WY7CCXX/',
                 'runParameters.xml'))
-        expected_data = {'RunParameters':
-                         {'Setup':
-                          {'ScannerID': 'ST-E00214',
-                           'FPGADynamicFocusSettings':
-                           {'MaxInitialZJumpHalfUm': '3'},
-                           'Reads': {'Read': [{'IsIndexedRead': 'N',
-                                               'NumCycles': '151',
-                                               'Number': '1'},
-                                              {'IsIndexedRead': 'Y',
-                                               'NumCycles': '8',
-                                               'Number': '2'},
-                                              {'IsIndexedRead': 'N',
-                                               'NumCycles': '151',
-                                               'Number': '3'}]},
-                           'ReagentKits': {'Sbs': {'SbsReagentKit':
-                                                   {'Prime': 'false',
-                                                    'IsNew200Cycle': 'true',
-                                                    'ID': 'Y'}},
-                                           'Pe': {'ReagentKit': {'ID': 'Y'}}},
-                           'TileWidth': '3200',
-                           'TempFolder': 'O:\\Illumina\\HiSeqTemp\\'
-                           + '150424_ST-E00214_0031_BH2WY7CCXX',
-                           'BaseSpaceSettings': {'Username': None},
-                           'SelectedSections': {'Section': {'Name': 'A_1'}},
-                           'ExperimentName': 'H2WY7CCXX'}}}
+        expected_data = {
+            'RunParameters': {
+                'Setup': {
+                    'ScannerID': 'ST-E00214',
+                    'FPGADynamicFocusSettings': {
+                        'MaxInitialZJumpHalfUm': '3'
+                        },
+                    'Reads': {
+                        'Read': [{
+                            'IsIndexedRead': 'N',
+                            'NumCycles': '151',
+                            'Number': '1'
+                        },
+                        {
+                            'IsIndexedRead': 'Y',
+                            'NumCycles': '8',
+                            'Number': '2'
+                        },
+                        {
+                            'IsIndexedRead': 'N',
+                            'NumCycles': '151',
+                            'Number': '3'
+                        }]},
+                    'ReagentKits': {
+                        'Sbs': {
+                            'SbsReagentKit': {
+                                'Prime': 'false',
+                                'IsNew200Cycle': 'true',
+                                'ID': 'Y'
+                                }},
+                                'Pe': {
+                                    'ReagentKit': {
+                                        'ID': 'Y'
+                                        }}},
+                    'TileWidth': '3200',
+                    'TempFolder': 'O:\\Illumina\\HiSeqTemp\\'
+                    + '150424_ST-E00214_0031_BH2WY7CCXX',
+                    'BaseSpaceSettings': {
+                        'Username': None
+                        },
+                    'SelectedSections': {
+                        'Section': {
+                            'Name': 'A_1'
+                            }},
+                    'ExperimentName': 'H2WY7CCXX'
+                    }}}
         self.assertEqual(parsed_run_parameters.data, expected_data)
 
         def test_run_parameters_file_missing(self):
@@ -151,8 +195,8 @@ class TestLaneBarcodeParser(unittest.TestCase):
                                  u'Raw data': u'default',
                                  u'Clusters': u'13,232',
                                  u'Barcode sequence': u'43,813,954'}]
-        assert parsed_lane_barcodes.flowcell_data == expected_flowcell_data
-        assert parsed_lane_barcodes.sample_data == expected_sample_data
+        self.assertEqual(parsed_lane_barcodes.flowcell_data, expected_flowcell_data)
+        self.assertEqual(parsed_lane_barcodes.sample_data, expected_sample_data)
 
     def test_lane_valid_case(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -169,7 +213,7 @@ class TestLaneBarcodeParser(unittest.TestCase):
                                  u'Raw data': u'620,815,680',
                                  u'Clusters': u'88.69',
                                  u'% of thelane': u'395,451,350'}]
-        assert parsed_lane.sample_data == expected_sample_data
+        self.assertEqual(parsed_lane.sample_data, expected_sample_data)
 
     def test_lane_barcode_file_missing(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -188,17 +232,16 @@ class TestCycleTimesParser(unittest.TestCase):
             path,
             '../test_data/150424_ST-E00214_0031_BH2WY7CCXX/Logs/',
             'CycleTimes.txt'))
-        expected_cycle_times_data = [{'start': datetime.datetime(2019, 5, 20, 15,
-                                                                 3, 22, 11000),
-                                      'cycle_number': 1,
-                                      'end': datetime.datetime(2019, 5, 20, 15,
-                                                               20, 3, 878000)},
-                                     {'start': datetime.datetime(2019, 5, 20, 15,
-                                                                 20, 4, 387000),
-                                      'cycle_number': 2,
-                                      'end': datetime.datetime(2019, 5, 20, 15,
-                                                               42, 14, 893000)}]
-        assert parsed_cycle_times.cycles == expected_cycle_times_data
+        expected_cycle_times_data = [{
+            'start': datetime.datetime(2019, 5, 20, 15, 3, 22, 11000),
+            'cycle_number': 1,
+            'end': datetime.datetime(2019, 5, 20, 15, 20, 3, 878000)},
+            {
+            'start': datetime.datetime(2019, 5, 20, 15, 20, 4, 387000),
+            'cycle_number': 2,
+            'end': datetime.datetime(2019, 5, 20, 15, 42, 14, 893000)
+            }]
+        self.assertEqual(parsed_cycle_times.cycles, expected_cycle_times_data)
 
     def test_cycle_times_file_empty(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -206,7 +249,7 @@ class TestCycleTimesParser(unittest.TestCase):
             path,
             '../test_data/191018_ST-E00214_0031_BH2WY7CCXX/Logs/',
             'CycleTimes.txt'))
-        assert parsed_cycle_times.cycles == []
+        self.assertEqual(parsed_cycle_times.cycles, [])
 
     def test_cycle_times_file_missing(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -223,23 +266,25 @@ class TestRunParser(unittest.TestCase):
         path = os.path.dirname(os.path.abspath(__file__))
         parsed_run = classes.RunParser(os.path.join(
             path, '../test_data/150424_ST-E00214_0031_BH2WY7CCXX'))
-        assert parsed_run.obj is not None
-        assert parsed_run.obj is not {}
+        self.assertNotEqual(parsed_run.obj, None)
+        self.assertNotEqual(parsed_run.obj, {})
 
     def test_runfolder_empty(self):
         path = os.path.dirname(os.path.abspath(__file__))
         parsed_run = classes.RunParser(os.path.join(
             path, '../test_data/191023_ST-E00214_0031_BH2WY7CCXX'))
-        expected_run_data = {'name': '191023_BH2WY7CCXX'}
-        assert parsed_run.obj == expected_run_data
-        assert parsed_run.runinfo is None
-        assert parsed_run.runparameters is None
-        assert parsed_run.samplesheet is None
-        assert parsed_run.lanebarcodes is None
-        assert parsed_run.lanes is None
-        assert parsed_run.undet is None
-        assert parsed_run.time_cycles is None
-        assert parsed_run.json_stats is None
+        expected_run_data = {
+            'name': '191023_BH2WY7CCXX'
+            }
+        self.assertEqual(parsed_run.obj, expected_run_data)
+        self.assertEqual(parsed_run.runinfo, None)
+        self.assertEqual(parsed_run.runparameters, None)
+        self.assertEqual(parsed_run.samplesheet, None)
+        self.assertEqual(parsed_run.lanebarcodes, None)
+        self.assertEqual(parsed_run.lanes, None)
+        self.assertEqual(parsed_run.undet, None)
+        self.assertEqual(parsed_run.time_cycles, None)
+        self.assertEqual(parsed_run.json_stats, None)
 
     def test_missing_runfolder(self):
         path = os.path.dirname(os.path.abspath(__file__))
