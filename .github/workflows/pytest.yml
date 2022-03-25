@@ -1,0 +1,46 @@
+name: pytests
+on:
+  push:
+    paths-ignore:
+      - "CHANGELOG.rst"
+      - "docs/**"
+  pull_request:
+    paths-ignore:
+      - "CHANGELOG.rst"
+      - "docs/**"
+jobs:
+  pytest:
+    name: run PyTest
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Git checkout
+        id: git_checkout
+        uses: actions/checkout@v2
+      # Get branch name
+      - name: Get branch name
+        id: get_branch_name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+      # Conda env create
+      - name: setup conda
+        id: setup_conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: testenv
+          environment-file: environment.yaml
+      # Install devyser_analysis and pytest dependencies 
+      - name: Install PyTest
+        id: install_pytest
+        shell: bash -l {0}
+        run: |
+          conda activate testenv
+          python setup.py install 
+      # Run PyTest
+      - name: Run PyTest
+        id: pytest
+        shell: bash -l {0}
+        run: |
+          conda activate testenv
+          pytest tests

@@ -1,2 +1,12 @@
-flowcell_parser/db.pyc
-flowcell_parser/classes.pyc
+
+*__pycache__/
+*.py[cod]
+
+build/
+dist/
+develop-eggs/
+eggs/
+*.egg-info/
+*.egg
+
+.vscode/
