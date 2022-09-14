@@ -43,7 +43,9 @@ class RunParser(object):
 
         fc_name = m.group(group_no)
         rinfo_path=os.path.join(self.path, 'RunInfo.xml')
-        rpar_path=os.path.join(self.path, 'runParameters.xml')        
+        rpar_path=os.path.join(self.path, 'runParameters.xml')
+        if not os.path.exists(rpar_path):
+            rpar_path = os.path.join(self.path, 'RunParameters.xml')
         ss_path=os.path.join(self.path, 'SampleSheet.csv')
         cycle_times_log = os.path.join(self.path, 'Logs', 'CycleTimes.txt')
 
