@@ -291,11 +291,14 @@ class SampleSheetV2Parser(SampleSheetParser):
 
     .header : a dict containing the info located under the [Header] section
     .reads : a list of the values in the [Reads] section
-    .settings : a dict containing the data from the [Settings] section
-
-    
-    .data : a list of the values under the [Data] section. These values are stored in a dict format
-    .datafields : a list of field names for the data section"""
+    .sequencer_settings : a dict containing the data from the [Sequencing_Settings] section
+    .convert_settings : a dict containing the data from the [BCLConvert_Settings] section
+    .cloud_settings : a dict containing the data from the [Cloud_Settings] section
+    .convert_data : a list of the values under the [BCLConvert_Data] section. These values are stored in a dict format
+    .convert_datafields : a list of field names for the [BCLConvert_Data] section
+    .data : a list of the values under the [Cloud_Data] section. These values are stored in a dict format
+    .datafields : a list of field names for the [Cloud_Data] section
+    """
 
     def parse(self, path:str):
         flag = None
@@ -304,61 +307,74 @@ class SampleSheetV2Parser(SampleSheetParser):
         convert_settings = {}
         sequencer_settings = {}
         cloud_settings = {}
-        csvlines = []
-        convert_csvlines = []
-        separator = ","
-
-        header_flags = {'[Header]': 'HEADER',
-                        '[Reads]': 'READS',
-                        '[BCLConvert_Settings]': 'BCLCONVERT_SETTINGS',
-                        '[Sequencing_Settings]': 'SEQUENCER_SETTINGS',
-                        '[Cloud_Settings]': 'CLOUD_SETTINGS',
-                        '[BCLConvert_Data]': 'CONVERT_DATA',
-                        '[Cloud_Data]': 'CLOUD_DATA',
-                        }
+        convert_data_fields = []
+        convert_data = []
+        cloud_data_fields = []
+        cloud_data = []
 
         with open(path, 'r') as csvfile:
             # Ignore empty lines (for instance the Illumina Experiment Manager
             # generates sample sheets with empty lines
             lines = filter(None, (line.rstrip() for line in csvfile))
-            # Now parse the file
+            # If header, set flag an go for next line
             for line in lines:
                 print(line)
                 if '[Header]' in line:
                     flag='HEADER'
+                    continue
                 elif '[Reads]' in line:
                     flag='READS'
+                    continue
                 elif '[BCLConvert_Settings]' in line:
                     flag='BCLCONVERT_SETTINGS'
+                    continue
                 elif '[Sequencing_Settings]' in line:
                     flag='SEQUENCER_SETTINGS'
+                    continue
                 elif '[Cloud_Settings]' in line:
                     flag='CLOUD_SETTINGS'
+                    continue
                 elif '[BCLConvert_Data]' in line:
                     flag='CONVERT_DATA'
+                    continue
                 elif '[Cloud_Data]' in line:
                     flag='CLOUD_DATA'
-                else:
-                    tokens=line.split(separator)
-                    if flag == 'HEADER':
-                        if len(tokens) < 2:
-                            self.log.error(f"File {path} does not seem has a correct format.")
-                            raise SyntaxError("Could not parse the samplesheet, "
-                                               "the file does not seem to have a correct format.")
-                        header[tokens[0]] = tokens[1]
-                    elif flag == 'READS':
-                        reads.append(tokens[0])
-                    elif flag == 'BCLCONVERT_SETTINGS':
-                        convert_settings[tokens[0]] = tokens[1]
-                    elif flag == 'SEQUENCER_SETTINGS':
-                        sequencer_settings[tokens[0]] = tokens[1]
-                    elif flag == 'CLOUD_SETTINGS':
-                        cloud_settings[tokens[0]] = tokens[1]
-                    elif flag == 'CONVERT_DATA':
-                        convert_csvlines.append(line)
-                    elif flag == 'CLOUD_DATA':
-                        csvlines.append(line)
+                    continue
+                
+                # Attempt to parse csv line 
+                try:
+                    tokens = next(csv.reader([line]))
+                except csv.Error as e:
+                    raise SyntaxError(f"Could not parse line '{line}' in {path}: {e}")
+                
+                if len(tokens) < 2:
+                    self.log.error(f"File {path} does not seem has a correct format.")
+                    raise SyntaxError("Could not parse the samplesheet, "
+                                            "the file does not seem to have a correct format.")
 
+                # Act on line depending based on current flag
+                if flag == 'HEADER':
+                    header[tokens[0]] = tokens[1]
+                elif flag == 'READS':
+                    reads.append(tokens[0])
+                elif flag == 'BCLCONVERT_SETTINGS':
+                    convert_settings[tokens[0]] = tokens[1]
+                elif flag == 'SEQUENCER_SETTINGS':
+                    sequencer_settings[tokens[0]] = tokens[1]
+                elif flag == 'CLOUD_SETTINGS':
+                    cloud_settings[tokens[0]] = tokens[1]
+                elif flag == 'CONVERT_DATA':
+                    if not convert_data_fields:
+                        convert_data_fields = tokens
+                    else:
+                        convert_data.append(dict(zip(convert_data_fields, tokens)))
+                elif flag == 'CLOUD_DATA':
+                    if not cloud_data_fields:
+                        cloud_data_fields = tokens
+                    else:
+                        cloud_data.append(dict(zip(cloud_data_fields, tokens)))
+            
+            # Set instance variables 
             self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
             self.dfield_proj = self._get_pattern_datafield(r'project.*?')
             self.header = header
@@ -366,18 +382,10 @@ class SampleSheetV2Parser(SampleSheetParser):
             self.sequencer_settings = sequencer_settings
             self.convert_settings = convert_settings
             self.cloud_settings = cloud_settings
-            self.convert_data, self.convert_datafields = self._csv_lines_to_dict_list(convert_csvlines)
-            self.data, self.datafields = self._csv_lines_to_dict_list(csvlines)    
-
-    def _csv_lines_to_dict_list(csv_lines:list[str]) -> Tuple[list[dict], list[str]]:
-        data = []
-        reader = csv.DictReader(csv_lines)
-        for row in reader:
-            linedict={}
-            for field in reader.fieldnames:
-                linedict[field]=row[field]
-            data.append(linedict)
-        return data, reader.fieldnames
+            self.convert_data = convert_data
+            self.convert_datafields = convert_data_fields
+            self.data, = cloud_data 
+            self.datafields = cloud_data_fields
 
 class RunInfoParser(object):
     """Parses  RunInfo.xml.
