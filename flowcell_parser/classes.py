@@ -384,8 +384,8 @@ class SampleSheetV2Parser(SampleSheetParser):
             self.cloud_settings = cloud_settings
             self.convert_data = convert_data
             self.convert_datafields = convert_data_fields
-            self.data, = cloud_data 
-            self.datafields = cloud_data_fields
+            self.cloud_data, = cloud_data 
+            self.cloud_datafields = cloud_data_fields
 
 class RunInfoParser(object):
     """Parses  RunInfo.xml.
