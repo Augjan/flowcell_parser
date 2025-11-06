@@ -324,7 +324,6 @@ class SampleSheetV2Parser(object):
             lines = filter(None, (line.rstrip() for line in csvfile))
             # If header, set flag an go for next line
             for line in lines:
-                print(line)
                 if '[Header]' in line:
                     flag='HEADER'
                     continue
