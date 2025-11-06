@@ -299,7 +299,13 @@ class SampleSheetV2Parser(SampleSheetParser):
     .data : a list of the values under the [Cloud_Data] section. These values are stored in a dict format
     .datafields : a list of field names for the [Cloud_Data] section
     """
-
+    def __init__(self, path):
+        self.log=logging.getLogger(__name__)
+        if os.path.exists(path):
+            self.parse(path)
+        else:
+            raise os.error(f"Sample sheet cannot be found at {path}")
+        
     def parse(self, path:str):
         flag = None
         header = {}
