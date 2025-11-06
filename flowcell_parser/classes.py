@@ -295,8 +295,8 @@ class SampleSheetV2Parser(object):
     .cloud_settings : a dict containing the data from the [Cloud_Settings] section
     .convert_data : a list of the values under the [BCLConvert_Data] section. These values are stored in a dict format
     .convert_datafields : a list of field names for the [BCLConvert_Data] section
-    .data : a list of the values under the [Cloud_Data] section. These values are stored in a dict format
-    .datafields : a list of field names for the [Cloud_Data] section
+    .cloud_data : a list of the values under the [Cloud_Data] section. These values are stored in a dict format
+    .cloud_datafields : a list of field names for the [Cloud_Data] section
     """
     def __init__(self, path:str):
         self.log=logging.getLogger(__name__)
