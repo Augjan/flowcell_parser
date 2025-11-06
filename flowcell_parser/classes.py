@@ -285,7 +285,7 @@ class SampleSheetParser(object):
                 return fld
         return ''
         
-class SampleSheetV2Parser(SampleSheetParser):
+class SampleSheetV2Parser(object):
     """Parses the V2 Samplesheets, with their fake csv format.
     Should be instantiated with the samplesheet path as an argument.
 
@@ -392,6 +392,12 @@ class SampleSheetV2Parser(SampleSheetParser):
             self.convert_datafields = convert_data_fields
             self.cloud_data, = cloud_data 
             self.cloud_datafields = cloud_data_fields
+
+    def _get_pattern_datafield(self, pattern):
+        for fld in self.cloud_datafields:
+            if re.search(pattern,fld,re.IGNORECASE):
+                return fld
+        return ''
 
 class RunInfoParser(object):
     """Parses  RunInfo.xml.
