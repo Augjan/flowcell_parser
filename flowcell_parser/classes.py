@@ -387,7 +387,7 @@ class SampleSheetV2Parser(object):
             self.cloud_settings = cloud_settings
             self.convert_data = convert_data
             self.convert_datafields = convert_data_fields
-            self.cloud_data, = cloud_data 
+            self.cloud_data = cloud_data 
             self.cloud_datafields = cloud_data_fields
             self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
             self.dfield_proj = self._get_pattern_datafield(r'project.*?')
