@@ -392,7 +392,7 @@ class SampleSheetV2Parser(object):
             self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
             self.dfield_proj = self._get_pattern_datafield(r'project.*?')
 
-    def _get_pattern_datafield(self, pattern):
+    def _get_pattern_datafield(self, pattern:str):
         for fld in self.cloud_datafields:
             if re.search(pattern,fld,re.IGNORECASE):
                 return fld
