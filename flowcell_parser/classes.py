@@ -605,7 +605,7 @@ class StatsParser(object):
             self.data = None
             self.parse()
         else:
-            raise os.error("file {0} cannot be found".format(path))
+            raise FileNotFoundError(f"File {path} cannot be found")
 
     def parse(self):
         with open(self.path) as data:
