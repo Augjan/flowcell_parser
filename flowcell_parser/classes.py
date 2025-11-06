@@ -394,7 +394,7 @@ class SampleSheetV2Parser(object):
 
     def _get_pattern_datafield(self, pattern:str):
         for fld in self.cloud_datafields:
-            if re.search(pattern,fld,re.IGNORECASE):
+            if re.search(pattern, fld,re.IGNORECASE):
                 return fld
         return ''
 
