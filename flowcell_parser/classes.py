@@ -380,8 +380,6 @@ class SampleSheetV2Parser(object):
                         cloud_data.append(dict(zip(cloud_data_fields, tokens)))
             
             # Set instance variables 
-            self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
-            self.dfield_proj = self._get_pattern_datafield(r'project.*?')
             self.header = header
             self.reads = reads
             self.sequencer_settings = sequencer_settings
@@ -391,6 +389,8 @@ class SampleSheetV2Parser(object):
             self.convert_datafields = convert_data_fields
             self.cloud_data, = cloud_data 
             self.cloud_datafields = cloud_data_fields
+            self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
+            self.dfield_proj = self._get_pattern_datafield(r'project.*?')
 
     def _get_pattern_datafield(self, pattern):
         for fld in self.cloud_datafields:
