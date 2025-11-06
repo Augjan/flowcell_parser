@@ -6,7 +6,6 @@ import logging
 import glob
 import json
 from datetime import datetime
-from typing import Tuple
 
 from collections import OrderedDict
 from bs4 import BeautifulSoup #html parser
