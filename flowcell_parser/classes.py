@@ -41,6 +41,10 @@ class RunParser(object):
             m       = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
             group_no = 3
 
+        # For MiSeq i100, the old reports can be produced with the '--output-legacy-stats true', but they will end up in a different location
+        if m.group(2).startswith('SL'):
+            demultiplexingDir = os.path.join(demultiplexingDir, 'Reports', 'legacy')
+
         fc_name = m.group(group_no)
         rinfo_path=os.path.join(self.path, 'RunInfo.xml')
         rpar_path=os.path.join(self.path, 'runParameters.xml')
@@ -53,8 +57,8 @@ class RunParser(object):
 
         lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
         ln_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
-        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')	
-        json_path = os.path.join(self.path, demultiplexingDir, 'Stats', 'Stats.json') 
+        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')
+        json_path = os.path.join(self.path, demultiplexingDir, 'Stats', 'Stats.json')
         
         try:
             self.runinfo=RunInfoParser(rinfo_path)
