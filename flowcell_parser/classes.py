@@ -42,8 +42,10 @@ class RunParser(object):
             group_no = 3
 
         # For MiSeq i100, the old reports can be produced with the '--output-legacy-stats true', but they will end up in a different location
+        samplesheet_parser = SampleSheetParser
         if m.group(2).startswith('SL'):
             demultiplexingDir = os.path.join(demultiplexingDir, 'Reports', 'legacy')
+            samplesheet_parser = SampleSheetV2Parser
 
         fc_name = m.group(group_no)
         rinfo_path=os.path.join(self.path, 'RunInfo.xml')
@@ -71,7 +73,7 @@ class RunParser(object):
             self.log.info(str(e))
             self.runparameters=None
         try:
-            self.samplesheet=SampleSheetParser(ss_path)
+            self.samplesheet=samplesheet_parser(ss_path)
         except OSError as e:
             self.log.info(str(e))
             self.samplesheet=None
