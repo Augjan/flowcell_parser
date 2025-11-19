@@ -400,8 +400,6 @@ class SampleSheetV2Parser(object):
             self.dfield_proj = self._get_pattern_datafield(r'project.*?')
             self.data = [a | b for a, b in zip(cloud_data, convert_data)]
 
-            pdb.set_trace()
-
     def _get_pattern_datafield(self, pattern:str):
         for fld in self.cloud_datafields:
             if re.search(pattern, fld,re.IGNORECASE):
