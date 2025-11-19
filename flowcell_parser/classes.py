@@ -104,7 +104,7 @@ class RunParser(object):
             self.json_stats = None
 
     def create_db_obj(self):        
-        self.obj={}        
+        self.obj={}
    
         bits=os.path.basename(os.path.abspath(self.path)).split('_')
         name="{0}_{1}".format(bits[0], bits[-1])
@@ -138,7 +138,7 @@ class RunParser(object):
 
         if self.json_stats:
 	        self.obj['Json_Stats'] = self.json_stats.data
-      
+
 
 class DemuxSummaryParser(object):
     def __init__(self, path):
@@ -170,7 +170,6 @@ class DemuxSummaryParser(object):
                             self.result[lane_nb][components[0]] = int(components[1])
                         self.TOTAL[lane_nb] += int(components[1])
 
-                    
 
 class LaneBarcodeParser(object):
     def __init__(self, path ):
@@ -217,6 +216,7 @@ class LaneBarcodeParser(object):
 
 class SampleSheetParser(object):
     """Parses  Samplesheets, with their fake csv format.
+
     Should be instancied with the samplesheet path as an argument.
 
     .header : a dict containing the info located under the [Header] section
@@ -289,7 +289,8 @@ class SampleSheetParser(object):
             if re.search(pattern,fld,re.IGNORECASE):
                 return fld
         return ''
-        
+
+
 class SampleSheetV2Parser(object):
     """Parses the V2 Samplesheets, with their fake csv format.
     Should be instantiated with the samplesheet path as an argument.
@@ -303,6 +304,7 @@ class SampleSheetV2Parser(object):
     .convert_datafields : a list of field names for the [BCLConvert_Data] section
     .cloud_data : a list of the values under the [Cloud_Data] section. These values are stored in a dict format
     .cloud_datafields : a list of field names for the [Cloud_Data] section
+    .data : a combination of cloud_data and convert_data, for legacy compatibility
     """
     def __init__(self, path:str):
         self.log=logging.getLogger(__name__)
@@ -397,11 +399,15 @@ class SampleSheetV2Parser(object):
             self.dfield_sid = self._get_pattern_datafield(r'sample_?id')
             self.dfield_proj = self._get_pattern_datafield(r'project.*?')
             self.data = [a | b for a, b in zip(cloud_data, convert_data)]
+
+            pdb.set_trace()
+
     def _get_pattern_datafield(self, pattern:str):
         for fld in self.cloud_datafields:
             if re.search(pattern, fld,re.IGNORECASE):
                 return fld
         return ''
+
 
 class RunInfoParser(object):
     """Parses  RunInfo.xml.
@@ -443,7 +449,6 @@ class RunInfoParser(object):
         self.data=data
         self.recipe=make_run_recipe(self.data.get('Reads', {}))
 
-
     def get_read_configuration(self):
         """return a list of dicts containig the Read Configuration
             """
@@ -477,8 +482,7 @@ class RunParametersParser(object):
         root = tree.getroot()
         self.data=xml_to_dict(root)
         self.recipe=make_run_recipe(self.data.get('Setup', {}).get('Reads', {}).get('Read', {}))
-        
-        
+
 
 def make_run_recipe(reads):
     """Based on either runParameters of RunInfo, gathers the information as to how many
@@ -499,7 +503,6 @@ def make_run_recipe(reads):
     if reads:
         return "{0}x{1}".format(nb_reads-nb_indexed_reads, numCycles)
     return None
-
 
 def xml_to_dict(root):
     current=None
@@ -601,6 +604,7 @@ class CycleTimesParser(object):
         # the last records is not saved inside the loop
         if current_cycle not in self.cycles:
             self.cycles.append(current_cycle)
+
 
 class StatsParser(object):
 
