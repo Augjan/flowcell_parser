@@ -67,7 +67,18 @@ class RunParser(object):
             self.samplesheet=None
 
         # Continue with files generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
-        fc_name = self.runinfo.data.get('Flowcell')
+        try:
+            if self.runinfo:
+                fc_name = self.runinfo.data.get('Flowcell','')
+            elif len(pattern_match.group(1))==8:
+                # Try to continue for an iSeq flow cell
+                fc_name = pattern_match.group(3)
+            else:
+                # Try to continue for a MiSeq/MiniSeq flow cell
+                fc_name = pattern_match.group(4)
+        except IndexError:
+            fc_name = ''
+
         lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
         ln_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
         undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')
