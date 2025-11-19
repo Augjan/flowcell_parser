@@ -33,35 +33,27 @@ class RunParser(object):
     def parse(self, demultiplexingDir='Demultiplexing'):
         """Tries to parse as many files as possible from a run folder"""
         pattern = r'(\d{6,8})_([ST-]*\w+\d+)_\d+_([AB]?)([A-Z0-9\-]+)'
-        group_no = 4
-        m       = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
-        #if the instrument is iseq so flowcell name may start with an A,B
-        if len(m.group(1))==8:
+        pattern_match = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
+        
+        # if the instrument is iseq so flowcell name may start with an A,B
+        if len(pattern_match.group(1))==8:
             pattern = r'(\d{6,8})_([ST-]*\w+\d+)_\d+_([A-Z0-9\-]+)'
-            m       = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
-            group_no = 3
+            pattern_match = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
 
         # For MiSeq i100, the old reports can be produced with the '--output-legacy-stats true', but they will end up in a different location
         samplesheet_parser = SampleSheetParser
-        if m.group(2).startswith('SL'):
+        if pattern_match.group(2).startswith('SL'):
             demultiplexingDir = os.path.join(demultiplexingDir, 'Reports', 'legacy')
             samplesheet_parser = SampleSheetV2Parser
 
-        fc_name = m.group(group_no)
-        rinfo_path=os.path.join(self.path, 'RunInfo.xml')
-        rpar_path=os.path.join(self.path, 'runParameters.xml')
+        # Start with the files existing before demultiplexing, located directly in run folder
+        rinfo_path = os.path.join(self.path, 'RunInfo.xml')
+        rpar_path = os.path.join(self.path, 'runParameters.xml')
         if not os.path.exists(rpar_path):
             rpar_path = os.path.join(self.path, 'RunParameters.xml')
-        ss_path=os.path.join(self.path, 'SampleSheet.csv')
+        ss_path = os.path.join(self.path, 'SampleSheet.csv')
         cycle_times_log = os.path.join(self.path, 'Logs', 'CycleTimes.txt')
 
-        #These three are generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
-
-        lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
-        ln_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
-        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')
-        json_path = os.path.join(self.path, demultiplexingDir, 'Stats', 'Stats.json')
-        
         try:
             self.runinfo=RunInfoParser(rinfo_path)
         except OSError as e:
@@ -77,21 +69,29 @@ class RunParser(object):
         except OSError as e:
             self.log.info(str(e))
             self.samplesheet=None
+
+        # Continue with files generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
+        fc_name = self.runinfo.data.get('Flowcell')
+        lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
+        ln_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'lane.html')
+        undeterminedStatsFolder = os.path.join(self.path, demultiplexingDir, 'Stats')
+        json_path = os.path.join(self.path, demultiplexingDir, 'Stats', 'Stats.json')
+
         try:
-            self.lanebarcodes=LaneBarcodeParser(lb_path)
+            self.lanebarcodes = LaneBarcodeParser(lb_path)
         except OSError as e:
             self.log.info(str(e))
-            self.lanebarcodes=None
+            self.lanebarcodes = None
         try:
-            self.lanes=LaneBarcodeParser(ln_path)
+            self.lanes = LaneBarcodeParser(ln_path)
         except OSError as e:
             self.log.info(str(e))
-            self.lanes=None
+            self.lanes = None
         try:
-            self.undet=DemuxSummaryParser(undeterminedStatsFolder)
+            self.undet = DemuxSummaryParser(undeterminedStatsFolder)
         except OSError as e:
             self.log.info(str(e))
-            self.undet=None
+            self.undet = None
         try:
             self.time_cycles = CycleTimesParser(cycle_times_log)
         except OSError as e:
