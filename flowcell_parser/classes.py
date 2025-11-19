@@ -77,7 +77,7 @@ class RunParser(object):
                 # Try to continue for a MiSeq/MiniSeq flow cell
                 fc_name = pattern_match.group(4)
         except IndexError:
-            self.log.error("Was not able to identify flow cell name")
+            self.log.error("Was not able to identify flow cell name. Flow cell directory has an unexpected pattern")
             fc_name = ''
 
         lb_path = os.path.join(self.path, demultiplexingDir, 'Reports', 'html', fc_name, 'all', 'all', 'all', 'laneBarcode.html')
