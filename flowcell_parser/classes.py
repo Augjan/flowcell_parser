@@ -32,19 +32,15 @@ class RunParser(object):
 
     def parse(self, demultiplexingDir='Demultiplexing'):
         """Tries to parse as many files as possible from a run folder"""
+        # When demultiplexing with BCL Convert, e.g. used for MiSeq i100, the old reports can be produced with '--output-legacy-stats true',
+        # but they will end up in a different location. Also, BCL Convert uses a new sample sheet format.
         pattern = r'(\d{6,8})_([ST-]*\w+\d+)_\d+_([AB]?)([A-Z0-9\-]+)'
         pattern_match = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
-        
-        # if the instrument is iseq so flowcell name may start with an A,B
-        if len(pattern_match.group(1))==8:
-            pattern = r'(\d{6,8})_([ST-]*\w+\d+)_\d+_([A-Z0-9\-]+)'
-            pattern_match = re.match(pattern, os.path.basename(os.path.abspath(self.path)))
-
-        # For MiSeq i100, the old reports can be produced with the '--output-legacy-stats true', but they will end up in a different location
-        samplesheet_parser = SampleSheetParser
         if pattern_match.group(2).startswith('SL'):
             demultiplexingDir = os.path.join(demultiplexingDir, 'Reports', 'legacy')
             samplesheet_parser = SampleSheetV2Parser
+        else:
+            samplesheet_parser = SampleSheetParser
 
         # Start with the files existing before demultiplexing, located directly in run folder
         rinfo_path = os.path.join(self.path, 'RunInfo.xml')
