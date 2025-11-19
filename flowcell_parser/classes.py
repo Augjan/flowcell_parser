@@ -502,7 +502,7 @@ def make_run_recipe(reads):
             nb_indexed_reads+=1
         else:
             if numCycles and numCycles != read['NumCycles']:
-                logging.warn("NumCycles in not coherent")
+                logging.warning("NumCycles in not coherent")
             else:
                 numCycles = read['NumCycles']
 
