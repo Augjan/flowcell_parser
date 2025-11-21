@@ -145,6 +145,9 @@ class RunParser(object):
             if self.lanes:
                 self.obj['illumina']['Demultiplex_Stats']['Lanes_stats'] = self.lanes.sample_data
         
+        if self.interop_data:
+            self.obj['InterOp'] = self.interop_data.data
+
         if self.undet:
             self.obj['Undetermined'] = self.undet.result
         
@@ -157,10 +160,6 @@ class RunParser(object):
 
         if self.json_stats:
             self.obj['Json_Stats'] = self.json_stats.data
-
-        if self.interop_data:
-            self.obj['InterOp'] = self.interop_data.data
-
 
 class DemuxSummaryParser(object):
     def __init__(self, path):
