@@ -5,10 +5,11 @@ import xml.etree.ElementTree as ET
 import logging
 import glob
 import json
+import pandas as pd
 from datetime import datetime
-
 from collections import OrderedDict
 from bs4 import BeautifulSoup #html parser
+from interop.core import imaging
 
 
 class RunParser(object):
@@ -65,6 +66,11 @@ class RunParser(object):
         except OSError as e:
             self.log.info(str(e))
             self.samplesheet = None
+        try:
+            self.interop_data = InterOpParser(self.path)
+        except OSError:
+            self.log.info(str(e))
+            self.interop_data = None
 
         # Continue with files generate post-demultiplexing and could thus potentially be replaced by reading from stats.json
         try:
@@ -151,6 +157,9 @@ class RunParser(object):
 
         if self.json_stats:
             self.obj['Json_Stats'] = self.json_stats.data
+
+        if self.interop_data:
+            self.obj['InterOp'] = self.interop_data.data
 
 
 class DemuxSummaryParser(object):
@@ -630,3 +639,36 @@ class StatsParser(object):
     def parse(self):
         with open(self.path) as data:
             self.data = json.load(data)
+
+
+class InterOpParser(object):
+    """
+    Parse tile data via the .bin files in the InterOp directory. 
+    Includes much of the data otherwise only visible via Sequence Analysis Viewer.
+    Relies on the interop package provided by Illumina.
+    """
+    def __init__(self, path):
+        if os.path.exists(path):
+            self.path = path
+            self.data = None
+            self.parse()
+        else:
+            raise FileNotFoundError(f"Directory {path} cannot be found")
+    
+    def parse(self):
+        all_data = pd.DataFrame(imaging(self.path))
+        all_data = all_data.fillna('')
+        data_dict = all_data.to_dict()
+
+        seen_tiles = set()
+        condensed_data = []
+        for index, tile in data_dict.get('Tile', {}).items():
+            if tile not in seen_tiles:
+                tile_data = {}
+                tile_data['Tile'] = int(tile)
+                tile_data['% Pass Filter'] = data_dict.get('% Pass Filter', {}).get(index, '')
+                tile_data['% Occupied'] = data_dict.get('% Occupied', {}).get(index, '')
+                seen_tiles.add(tile)
+                condensed_data.append(tile_data)
+        
+        self.data = condensed_data
