@@ -117,16 +117,20 @@ class RunParser(object):
         bits = os.path.basename(os.path.abspath(self.path)).split('_')
         name = f"{bits[0]}_{bits[-1]}"
         self.obj['name'] = name
+        
         if self.runinfo:
             self.obj['RunInfo'] = self.runinfo.data
             if self.runinfo.recipe:
                 self.obj['run_setup'] = self.runinfo.recipe
+        
         if self.runparameters:
             self.obj.update(self.runparameters.data)
             if self.runparameters.recipe:
                 self.obj['run_setup'] = self.runparameters.recipe
+        
         if self.samplesheet:
             self.obj['samplesheet_csv'] = self.samplesheet.data
+        
         if self.lanebarcodes:
             self.obj['illumina'] = {}
             self.obj['illumina']['Demultiplex_Stats'] = {}
@@ -134,15 +138,16 @@ class RunParser(object):
             self.obj['illumina']['Demultiplex_Stats']['Flowcell_stats'] = self.lanebarcodes.flowcell_data
             if self.lanes:
                 self.obj['illumina']['Demultiplex_Stats']['Lanes_stats'] = self.lanes.sample_data
+        
         if self.undet:
             self.obj['Undetermined'] = self.undet.result
+        
         if self.time_cycles:
             time_cycles = []
             for cycle in self.time_cycles.cycles:
                 for k,v in cycle.items():
                     cycle[k] = str(v)
             self.obj['time cycles'] = self.time_cycles.cycles
-
 
         if self.json_stats:
             self.obj['Json_Stats'] = self.json_stats.data
